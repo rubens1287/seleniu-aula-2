@@ -1,5 +1,7 @@
 package br.com.test;
 
+import br.com.utils.StringUtils;
+import com.github.javafaker.Faker;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,33 +12,11 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class Pesquisa {
+import java.text.Normalizer;
+import java.util.Locale;
 
-    WebDriver driver;
+public class Pesquisa extends Base{
 
-    @Before
-    public void setup(){
-        /*
-        imforma onde está o driver chromedriver para o selenium
-         */
-        System.setProperty("webdriver.chrome.driver", "src/test/resources/chromedriver.exe");
-        /*
-           cria navegador do tipo chrome
-         */
-        driver = new ChromeDriver();
-        /*
-        maximiza a tela
-         */
-        driver.manage().window().maximize();
-    }
-
-    @After
-    public void tearDown(){
-        /*
-        fechar navegador
-         */
-        driver.close();
-    }
 
     @Test
     public void pesquisarNoGoogle(){
@@ -81,5 +61,27 @@ public class Pesquisa {
 
     }
 
+    @Test
+    public void cadastrarUsuario() throws InterruptedException {
+
+        driver.get("https://seubarriga.wcaquino.me/login");
+
+        Thread.sleep(1000);
+
+        driver.findElement(By.xpath("//a[contains(text(),'Novo usuário?')]")).click();
+
+        Thread.sleep(1000);
+
+        Faker faker = new Faker(new Locale("pt-BR"));
+
+        driver.findElement(By.id("nome")).sendKeys("Angelica Turquesa");
+        driver.findElement(By.id("email")).sendKeys(StringUtils.unaccent(faker.name().name().replace(" ","") + "@gft.com"));
+        driver.findElement(By.id("senha")).sendKeys("123@nath");
+        Thread.sleep(1000);
+        driver.findElement(By.xpath("//input[@value='Cadastrar']")).click();
+        Thread.sleep(1000);
+        WebDriverWait wait = new WebDriverWait(driver, 5);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[contains(text(), 'Usuário inserido com sucesso')]")));
+    }
 
 }
